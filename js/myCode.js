@@ -32,6 +32,23 @@ class Platform extends Sprite {
     }
 }
 
+class Wall extends Sprite {
+    constructor(x, y, width, height, color) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+
+    draw(ctx) {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+}
+
+
 class Hero extends Sprite {
     constructor(x, y, width, height, dX, color) {
         super();
@@ -56,6 +73,10 @@ class Hero extends Sprite {
     }
 
     update(sprites, keys) {
+        // Used for collision with wall and platforms
+        const previousX = this.x;
+        const previousY = this.y;
+
         // Horizontal movement
         if ((keys['ArrowLeft'] || keys['a']) && this.x >= this.width) {
             this.x -= this.dX;
@@ -89,8 +110,6 @@ class Hero extends Sprite {
         if (!keys['c'] && !keys['j']) this.canChangeColor = true;
 
 
-        // Remember the old bottom so we only land when crossing a top.
-        const previousBottom = this.y + this.height; // Bottom of the ball before updating
         this.dY += this.gravity;
         this.y += this.dY;
 
@@ -98,35 +117,73 @@ class Hero extends Sprite {
         let landingPlatform = null;
 
         for (const sprite of sprites) {
-            if (!(sprite instanceof Platform)) continue;
+            if (sprite instanceof Platform) {
 
-            // x axis
-            const overlaps =
-                this.x < sprite.x + sprite.width &&
-                this.x + this.width > sprite.x;
+                // x axis
+                const overlaps =
+                    this.x < sprite.x + sprite.width &&
+                    this.x + this.width > sprite.x;
 
-            // y axis
-            const crossesTop =
-                previousBottom <= sprite.y && // ball was ABOVE the platform
-                this.y + this.height >= sprite.y; // ball is now BELOW the platform
+                // y axis
+                const crossesTop =
+                    previousY + this.height <= sprite.y && // ball was ABOVE the platform
+                    this.y + this.height >= sprite.y; // ball is now BELOW the platform
 
-            // Check if sprite and this have same color OR the sprite is black (black = always collide)
-            const colorCollision = (this.color === sprite.color) || sprite.color === BLACK;
+                // Check if sprite and this have same color OR the sprite is black (black = always collide)
+                const colorCollision = (this.color === sprite.color) || sprite.color === BLACK;
 
-            // Ball is falling AND ...
-            if (this.dY >= 0 && overlaps && crossesTop && colorCollision) {
-                // if no platform found yet  OR  new platform is higher than previous landingPlatform
-                if (landingPlatform === null || sprite.y < landingPlatform.y) {
-                    landingPlatform = sprite;
+                // Ball is falling AND ...
+                if (this.dY >= 0 && overlaps && crossesTop && colorCollision) {
+                    // if no platform found yet  OR  new platform is higher than previous landingPlatform
+                    if (landingPlatform === null || sprite.y < landingPlatform.y) {
+                        landingPlatform = sprite;
+                    }
+                }
+
+            } else if (sprite instanceof Wall) {
+                // x axis
+                const crossesLeft =
+                    previousX + this.width <= sprite.x &&
+                    this.x + this.width >= sprite.x;
+
+                const crossesRight =
+                    previousX >= sprite.x + sprite.width &&
+                    this.x <= sprite.x + sprite.width;
+
+                const collisionX =
+                    this.x < sprite.x + sprite.width &&
+                    this.x + this.width > sprite.x;
+
+                // y axis
+                const crossesTop =
+                    previousY + this.height <= sprite.y &&
+                    this.y + this.height >= sprite.y;
+
+                const crossesBottom =
+                    previousY >= sprite.y + sprite.height &&
+                    this.y <= sprite.y + sprite.height;
+
+
+                const collisionY =
+                    this.y < sprite.y + sprite.height &&
+                    this.y + this.height > sprite.y;
+
+                if (collisionY) {
+                    if (crossesLeft) this.x = sprite.x - this.width;
+                    else if (crossesRight) this.x = sprite.x + sprite.width;
+                }
+                if (collisionX) {
+                    if (crossesTop) this.y = sprite.y - this.height;
+                    else if (crossesBottom) this.y = sprite.y + sprite.height;
                 }
             }
-        }
 
-        // Ball landed on a platform/ground
-        if (landingPlatform !== null) {
-            this.y = landingPlatform.y - this.height;
-            this.dY = 0;
-            this.jumpCount = 0;
+            // Ball landed on a platform/ground
+            if (landingPlatform !== null) {
+                this.y = landingPlatform.y - this.height;
+                this.dY = 0;
+                this.jumpCount = 0;
+            }
         }
     }
 
@@ -135,8 +192,9 @@ class Hero extends Sprite {
 
         // ctx.fillStyle = "#e62f2fb0";
         ctx.fillStyle = this.color;
-        ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2, false);
-        ctx.fill();
+        // ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2, false);
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        // ctx.fill();
     }
 }
 
@@ -222,7 +280,7 @@ let game = new Game();
 game.addSprite(new Background());
 
 // Add hero
-let hero = new Hero(50, CANVAS_HEIGHT - 50, 20, 20, 5, RED);
+let hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, RED);
 game.addSprite(hero);
 
 // Add color helper
@@ -250,6 +308,8 @@ game.addSprite(new Platform(150, CANVAS_HEIGHT - 350, 20, 100, YELLOW));
 
 game.addSprite(new Platform(1000, 200, 100, 25, RED));
 
+// Add walls
+game.addSprite(new Wall(720, -100, 20, 300, BLACK))
 
 // Start game
 game.animate();
