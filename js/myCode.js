@@ -1,4 +1,3 @@
-// Use const to change value easier
 const CANVAS = document.getElementById("canvas");
 const CANVAS_WIDTH = CANVAS.width;
 const CANVAS_HEIGHT = CANVAS.height;
@@ -63,9 +62,9 @@ class Hero extends Sprite {
         // Jump information
         this.dY = 0;
         this.gravity = 0.6;
-        this.jumpForce = -10;
+        this.jumpForce = -13;
         this.jumpCount = 0;
-        this.maxJumps = 2;
+        this.maxJumps = 1;
         this.canJump = true; // true if space is not being pressed
 
         // Change color information
@@ -108,7 +107,6 @@ class Hero extends Sprite {
             }
         }
         if (!keys['c'] && !keys['j']) this.canChangeColor = true;
-
 
         this.dY += this.gravity;
         this.y += this.dY;
@@ -295,10 +293,10 @@ game.addSprite(gift);
 // Ground
 game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, BLACK));
 
-game.addSprite(new Platform(125, 300, 150, 25, BLUE));
+game.addSprite(new Platform(125, 320, 150, 25, BLUE));
 game.addSprite(new Platform(340, 220, 140, 25, YELLOW));
-game.addSprite(new Platform(550, 100, 125, 25, RED));
-game.addSprite(new Platform(670, 250, 90, 25, YELLOW));
+game.addSprite(new Platform(570, 100, 125, 25, RED));
+game.addSprite(new Platform(725, 280, 90, 25, YELLOW));
 
 // Lower half platforms
 game.addSprite(new Platform(150, CANVAS_HEIGHT - 150, 20, 100, RED));
@@ -309,7 +307,7 @@ game.addSprite(new Platform(150, CANVAS_HEIGHT - 350, 20, 100, YELLOW));
 game.addSprite(new Platform(1000, 200, 100, 25, RED));
 
 // Add walls
-game.addSprite(new Wall(720, -100, 20, 300, BLACK))
+game.addSprite(new Wall(720, -100, 20, 300, BLACK));
 
 // Start game
 game.animate();
