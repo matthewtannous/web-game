@@ -79,7 +79,7 @@ class Game {
     }
 
     nextLevel() {
-        this.setLevel(this.currentLevelIndex + 1);
+        this.changeLevel(this.currentLevelIndex + 1);
     }
 
     previousLevel() {

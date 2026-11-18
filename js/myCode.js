@@ -6,9 +6,9 @@ const CANVAS_HEIGHT = CANVAS.height;
 const COLOR0 = "black"; // Wall color, cannot phase through black object
 
 // Player colors
-const COLOR1 = "yellow";
-const COLOR2 = "red";
-const COLOR3 = "blue";
+const COLOR1 = "red";
+const COLOR2 = "blue";
+const COLOR3 = "yellow";
 
 class Background extends Sprite {
     draw(ctx) {
@@ -199,7 +199,7 @@ class Hero extends Sprite {
 }
 
 class Gift extends Sprite {
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, game) {
         super();
         this.x = x;
         this.y = y;
@@ -207,6 +207,9 @@ class Gift extends Sprite {
         this.height = height;
 
         this.collected = false;
+
+        // Levels
+        this.game = game;
     }
 
     update(sprites) {
@@ -223,6 +226,7 @@ class Gift extends Sprite {
                     sprite.y - sprite.height <= this.y + this.height
                 ) {
                     this.collected = true;
+                    this.game.nextLevel();
                 }
             }
         }
@@ -273,21 +277,52 @@ class ColorHelper extends Sprite {
     }
 }
 
-
 class Level1 extends Level {
     initialize() {
         // Add background
         this.game.addSprite(new Background());
 
         // Add hero
-        const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR2);
+        const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR1);
+        this.game.addSprite(hero);
+
+        // Add color helper
+        this.game.addSprite(new ColorHelper(hero));
+
+        // Add platforms
+        // Ground
+        this.game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0));
+
+        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 150, 200, 30, COLOR1));
+        this.game.addSprite(new Platform(600, CANVAS_HEIGHT - 250, 200, 30, COLOR1));
+
+        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 350, 200, 30, COLOR2));
+        this.game.addSprite(new Platform(600, CANVAS_HEIGHT - 450, 200, 30, COLOR2));
+
+        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 550, 200, 30, COLOR3));
+        this.game.addSprite(new Platform(600, CANVAS_HEIGHT - 650, 200, 30, COLOR3));
+
+        // Add gift
+        const gift = new Gift(900, 20, 35, 40, this.game); // Change level when collecting gift
+        this.game.addSprite(gift);
+
+    }
+}
+
+class Level2 extends Level {
+    initialize() {
+        // Add background
+        this.game.addSprite(new Background());
+
+        // Add hero
+        const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR1);
         this.game.addSprite(hero);
 
         // Add color helper
         this.game.addSprite(new ColorHelper(hero));
 
         // Add gift
-        const gift = new Gift(CANVAS_WIDTH - 50, 20, 35, 40);
+        const gift = new Gift(CANVAS_WIDTH - 50, 20, 35, 40, this.game);
         this.game.addSprite(gift);
 
         // Add platforms
@@ -314,4 +349,5 @@ class Level1 extends Level {
 // Start game
 const game = new Game();
 game.addLevel(new Level1(game));
+game.addLevel(new Level2(game));
 game.animate();
