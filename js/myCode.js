@@ -3,10 +3,12 @@ const CANVAS_WIDTH = CANVAS.width;
 const CANVAS_HEIGHT = CANVAS.height;
 
 // Colors
-const YELLOW = "yellow";
-const RED = "red";
-const BLUE = "blue";
-const BLACK = "black";
+const COLOR0 = "black"; // Wall color, cannot phase through black object
+
+// Player colors
+const COLOR1 = "yellow";
+const COLOR2 = "red";
+const COLOR3 = "blue";
 
 class Background extends Sprite {
     draw(ctx) {
@@ -96,14 +98,14 @@ class Hero extends Sprite {
             this.canChangeColor = false;
 
             switch (this.color) {
-                case YELLOW:
-                    this.color = RED;
+                case COLOR1:
+                    this.color = COLOR2;
                     break;
-                case RED:
-                    this.color = BLUE;
+                case COLOR2:
+                    this.color = COLOR3;
                     break;
-                case BLUE:
-                    this.color = YELLOW;
+                case COLOR3:
+                    this.color = COLOR1;
             }
         }
         if (!keys['c'] && !keys['j']) this.canChangeColor = true;
@@ -128,7 +130,7 @@ class Hero extends Sprite {
                     this.y + this.height >= sprite.y; // ball is now BELOW the platform
 
                 // Check if sprite and this have same color OR the sprite is black (black = always collide)
-                const colorCollision = (this.color === sprite.color) || sprite.color === BLACK;
+                const colorCollision = (this.color === sprite.color) || sprite.color === COLOR0;
 
                 // Ball is falling AND ...
                 if (this.dY >= 0 && overlaps && crossesTop && colorCollision) {
@@ -208,19 +210,19 @@ class Gift extends Sprite {
     }
 
     update(sprites) {
-        // Add  !this.collected  so it exits early, since there is no need to do
+        // Check this.collected  so it exits early, since there is no need to do
         // anything in this function after collecting the gift
-        if (!this.collected) {
-            for (let sprite of sprites) {
-                if (sprite instanceof Hero) {
-                    // Check collision
-                    if (sprite.x + sprite.width >= this.x &&
-                        sprite.x - sprite.width <= this.x + this.width &&
-                        sprite.y + sprite.height >= this.y &&
-                        sprite.y - sprite.height <= this.y + this.height
-                    ) {
-                        this.collected = true;
-                    }
+        if (this.collected) return;
+
+        for (let sprite of sprites) {
+            if (sprite instanceof Hero) {
+                // Check collision
+                if (sprite.x + sprite.width >= this.x &&
+                    sprite.x - sprite.width <= this.x + this.width &&
+                    sprite.y + sprite.height >= this.y &&
+                    sprite.y - sprite.height <= this.y + this.height
+                ) {
+                    this.collected = true;
                 }
             }
         }
@@ -251,16 +253,15 @@ class ColorHelper extends Sprite {
 
     draw(ctx) {
         ctx.beginPath();
-
-        switch (hero.color) {
-            case YELLOW:
-                this.nextColor = RED;
+        switch (this.hero.color) {
+            case COLOR1:
+                this.nextColor = COLOR2;
                 break;
-            case RED:
-                this.nextColor = BLUE;
+            case COLOR2:
+                this.nextColor = COLOR3;
                 break;
-            case BLUE:
-                this.nextColor = YELLOW;
+            case COLOR3:
+                this.nextColor = COLOR1;
         }
         ctx.font = "20px Arial";
         ctx.fillStyle = this.nextColor;
@@ -272,42 +273,45 @@ class ColorHelper extends Sprite {
     }
 }
 
-let game = new Game();
 
-// Add background
-game.addSprite(new Background());
+class Level1 extends Level {
+    initialize() {
+        // Add background
+        this.game.addSprite(new Background());
 
-// Add hero
-let hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, RED);
-game.addSprite(hero);
+        // Add hero
+        const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR2);
+        this.game.addSprite(hero);
 
-// Add color helper
-game.addSprite(new ColorHelper(hero));
+        // Add color helper
+        this.game.addSprite(new ColorHelper(hero));
 
+        // Add gift
+        const gift = new Gift(CANVAS_WIDTH - 50, 20, 35, 40);
+        this.game.addSprite(gift);
 
-// Add gift
-let gift = new Gift(CANVAS_WIDTH - 50, 20, 35, 40);
-game.addSprite(gift);
+        // Add platforms
+        // Ground
+        this.game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0));
 
-// Add platforms
-// Ground
-game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, BLACK));
+        this.game.addSprite(new Platform(125, 320, 150, 25, COLOR3));
+        this.game.addSprite(new Platform(340, 220, 140, 25, COLOR1));
+        this.game.addSprite(new Platform(570, 100, 125, 25, COLOR2));
+        this.game.addSprite(new Platform(725, 280, 90, 25, COLOR1));
 
-game.addSprite(new Platform(125, 320, 150, 25, BLUE));
-game.addSprite(new Platform(340, 220, 140, 25, YELLOW));
-game.addSprite(new Platform(570, 100, 125, 25, RED));
-game.addSprite(new Platform(725, 280, 90, 25, YELLOW));
+        // Lower half platforms
+        this.game.addSprite(new Platform(150, CANVAS_HEIGHT - 150, 20, 100, COLOR2));
+        this.game.addSprite(new Platform(150, CANVAS_HEIGHT - 250, 20, 100, COLOR3));
+        this.game.addSprite(new Platform(150, CANVAS_HEIGHT - 350, 20, 100, COLOR1));
 
-// Lower half platforms
-game.addSprite(new Platform(150, CANVAS_HEIGHT - 150, 20, 100, RED));
-game.addSprite(new Platform(150, CANVAS_HEIGHT - 250, 20, 100, BLUE));
-game.addSprite(new Platform(150, CANVAS_HEIGHT - 350, 20, 100, YELLOW));
+        this.game.addSprite(new Platform(1000, 200, 100, 25, COLOR2));
 
-
-game.addSprite(new Platform(1000, 200, 100, 25, RED));
-
-// Add walls
-game.addSprite(new Wall(720, -100, 20, 300, BLACK));
+        // Add walls
+        this.game.addSprite(new Wall(720, -100, 20, 300, COLOR0));
+    }
+}
 
 // Start game
+const game = new Game();
+game.addLevel(new Level1(game));
 game.animate();
