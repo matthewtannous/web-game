@@ -75,7 +75,7 @@ class Hero extends Sprite {
         const previousY = this.y;
 
         // Horizontal movement
-        if ((keys['ArrowLeft'] || keys['a']) && this.x >= this.width) {
+        if ((keys['ArrowLeft'] || keys['a']) && this.x >= 0) {
             this.x -= this.dX;
         }
         if ((keys['ArrowRight'] || keys['d']) && this.x <= CANVAS_WIDTH - this.width) {
