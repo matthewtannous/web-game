@@ -1,7 +1,3 @@
-const CANVAS = document.getElementById("canvas");
-const CANVAS_WIDTH = CANVAS.width;
-const CANVAS_HEIGHT = CANVAS.height;
-
 // Colors
 const COLOR0 = "black"; // Wall color, cannot phase through black object
 
@@ -346,8 +342,12 @@ class Level2 extends Level {
     }
 }
 
+// Add camera
+let camera = new Camera();
+camera.setLevelBoundaries(500, 600);
+
 // Start game
-const game = new Game();
+const game = new Game(camera);
 game.addLevel(new Level1(game));
 game.addLevel(new Level2(game));
 game.animate();
