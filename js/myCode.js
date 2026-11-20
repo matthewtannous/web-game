@@ -246,9 +246,14 @@ class Gift extends Sprite {
 }
 
 class ColorHelper extends Sprite {
-    constructor(hero) {
+    constructor(hero, startedGame = true) {
         super();
         this.hero = hero;
+        this.startedGame = startedGame;
+    }
+
+    update(sprites, keys) {
+        if (keys['c'] || keys['j']) this.startedGame = true;
     }
 
     draw(ctx) {
@@ -263,13 +268,20 @@ class ColorHelper extends Sprite {
             case COLOR3:
                 this.nextColor = COLOR1;
         }
+
+        if (!this.startedGame) {
+            ctx.font = "50px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText("Press j or c to change color", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+        }
+
         ctx.font = "20px Arial";
         ctx.fillStyle = this.nextColor;
         ctx.textAlign = "left";
         ctx.fillText("Next:", 0, 20);
         ctx.arc(65, 15, 15, 0, Math.PI * 2, false);
         ctx.fill();
-
     }
 }
 
@@ -283,25 +295,26 @@ class Level1 extends Level {
         this.game.addSprite(hero);
 
         // Add color helper
-        this.game.addSprite(new ColorHelper(hero));
+        this.game.addSprite(new ColorHelper(hero, false));
 
         // Add platforms
         // Ground
         this.game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0));
 
-        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 150, 200, 30, COLOR1));
-        this.game.addSprite(new Platform(600, CANVAS_HEIGHT - 250, 200, 30, COLOR1));
+        this.game.addSprite(new Platform(200, CANVAS_HEIGHT - 150, 200, 30, COLOR1));
+        this.game.addSprite(new Platform(500, CANVAS_HEIGHT - 250, 200, 30, COLOR1));
 
-        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 350, 200, 30, COLOR2));
-        this.game.addSprite(new Platform(600, CANVAS_HEIGHT - 450, 200, 30, COLOR2));
+        this.game.addSprite(new Platform(200, CANVAS_HEIGHT - 350, 200, 30, COLOR2));
+        this.game.addSprite(new Platform(500, CANVAS_HEIGHT - 450, 200, 30, COLOR2));
 
-        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 550, 200, 30, COLOR3));
-        this.game.addSprite(new Platform(600, CANVAS_HEIGHT - 650, 200, 30, COLOR3));
+        this.game.addSprite(new Platform(200, CANVAS_HEIGHT - 550, 200, 30, COLOR3));
+        this.game.addSprite(new Platform(500, CANVAS_HEIGHT - 650, 200, 30, COLOR3));
+
+        this.game.addSprite(new Platform(900, CANVAS_HEIGHT - 700, 300, 30, COLOR1));
 
         // Add gift
-        const gift = new Gift(900, 20, 35, 40, this.game); // Change level when collecting gift
+        const gift = new Gift(CANVAS_WIDTH - 100, 20, 35, 40, this.game); // Change level when collecting gift
         this.game.addSprite(gift);
-
     }
 }
 
