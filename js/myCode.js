@@ -1,3 +1,6 @@
+let backgroundMusic = new Audio("assets/audio/background-music.opus")
+backgroundMusic.play();
+
 // Colors
 const COLOR0 = "black"; // Wall color, cannot phase through black object
 
