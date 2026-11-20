@@ -33,25 +33,49 @@ class Platform extends Sprite {
 }
 
 class Wall extends Sprite {
-    constructor(x, y, width, height, color) {
+    constructor(x, y, width, height, color,
+        topSpikes = false, bottomSpikes = false, leftSpikes = false, rightSpikes = false,
+    ) {
         super();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.color = color;
+
+        this.topSpikes = topSpikes;
+        this.leftSpikes = leftSpikes;
+        this.rightSpikes = rightSpikes;
+        this.bottomSpikes = bottomSpikes;
     }
 
     draw(ctx) {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // Draw spikes (just a rectangle for now)
+        ctx.fillStyle = "gray";
+        if (this.topSpikes)
+            ctx.fillRect(this.x, this.y, this.width, 10);
+
+        if (this.bottomSpikes)
+            ctx.fillRect(this.x, this.y + this.height - 10, this.width, 10);
+
+        if (this.leftSpikes)
+            ctx.fillRect(this.x, this.y, 10, this.height);
+
+        if (this.rightSpikes)
+            ctx.fillRect(this.x + this.width - 10, this.y, 10, this.height);
     }
 }
 
 
 class Hero extends Sprite {
-    constructor(x, y, width, height, dX, color) {
+    constructor(x, y, width, height, dX, color, maxJumps = 1) {
         super();
+
+        this.startX = x;
+        this.startY = y;
 
         this.x = x;
         this.y = y;
@@ -65,7 +89,7 @@ class Hero extends Sprite {
         this.gravity = 0.6;
         this.jumpForce = -13;
         this.jumpCount = 0;
-        this.maxJumps = 1;
+        this.maxJumps = maxJumps;
         this.canJump = true; // true if space is not being pressed
 
         // Change color information
@@ -168,12 +192,36 @@ class Hero extends Sprite {
                     this.y + this.height > sprite.y;
 
                 if (collisionY) {
-                    if (crossesLeft) this.x = sprite.x - this.width;
-                    else if (crossesRight) this.x = sprite.x + sprite.width;
+                    if (crossesLeft) {
+                        this.x = sprite.x - this.width;
+                        if (sprite.leftSpikes) {
+                            this.die();
+                            return;
+                        }
+                    }
+                    else if (crossesRight) {
+                        this.x = sprite.x + sprite.width;
+                        if (sprite.rightSpikes) {
+                            this.die();
+                            return;
+                        }
+                    }
                 }
                 if (collisionX) {
-                    if (crossesTop) this.y = sprite.y - this.height;
-                    else if (crossesBottom) this.y = sprite.y + sprite.height;
+                    if (crossesTop) {
+                        this.y = sprite.y - this.height;
+                        if (sprite.topSpikes) {
+                            this.die();
+                            return;
+                        }
+                    }
+                    else if (crossesBottom) {
+                        this.y = sprite.y + sprite.height;
+                        if (sprite.bottomSpikes) {
+                            this.die();
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -194,6 +242,12 @@ class Hero extends Sprite {
         // ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2, false);
         ctx.fillRect(this.x, this.y, this.width, this.height);
         // ctx.fill();
+    }
+
+    die() {
+        this.x = this.startX;
+        this.y = this.startY;
+        this.dY = 0;
     }
 }
 
@@ -249,14 +303,9 @@ class Gift extends Sprite {
 }
 
 class ColorHelper extends Sprite {
-    constructor(hero, startedGame = true) {
+    constructor(hero) {
         super();
         this.hero = hero;
-        this.startedGame = startedGame;
-    }
-
-    update(sprites, keys) {
-        if (keys['c'] || keys['j']) this.startedGame = true;
     }
 
     draw(ctx) {
@@ -272,19 +321,42 @@ class ColorHelper extends Sprite {
                 this.nextColor = COLOR1;
         }
 
-        if (!this.startedGame) {
-            ctx.font = "50px Arial";
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText("Press j or c to change color", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
-        }
-
         ctx.font = "20px Arial";
         ctx.fillStyle = this.nextColor;
         ctx.textAlign = "left";
         ctx.fillText("Next:", 0, 20);
         ctx.arc(65, 15, 15, 0, Math.PI * 2, false);
         ctx.fill();
+    }
+}
+
+class TutorialText extends Sprite {
+    update(sprites, keys) {
+        if (Object.keys(keys).length !== 0) return true; // Delete the sprite
+    }
+
+    draw(ctx) {
+        ctx.font = "50px Arial";
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText("Press j or c to change color", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+    }
+}
+
+class JokeText extends Sprite {
+    constructor() {
+        super();
+        this.time = 300;
+    }
+    update(sprites, keys) {
+        if (--this.time === 0) return true; // Delete the sprite
+    }
+
+    draw(ctx) {
+        ctx.font = "50px Arial";
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText("Final Level (for now). You have 5 jumps! Good luck :)", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3);
     }
 }
 
@@ -298,7 +370,11 @@ class Level1 extends Level {
         this.game.addSprite(hero);
 
         // Add color helper
-        this.game.addSprite(new ColorHelper(hero, false));
+        this.game.addSprite(new ColorHelper(hero));
+
+        // Add tutorial
+        this.game.addSprite(new TutorialText());
+
 
         // Add platforms
         // Ground
@@ -358,6 +434,34 @@ class Level2 extends Level {
     }
 }
 
+class Level3 extends Level {
+    initialize() {
+        // Add background
+        this.game.addSprite(new Background());
+
+        // Add hero
+        const hero = new Hero(50, CANVAS_HEIGHT - 300, 50, 50, 5, COLOR1, 5);
+        this.game.addSprite(hero);
+
+        // Add color helper
+        this.game.addSprite(new ColorHelper(hero));
+
+        // Add platforms
+        // Ground
+        this.game.addSprite(new Wall(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0, true));
+
+        this.game.addSprite(new Wall(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 50, CANVAS_HEIGHT / 2, COLOR0, true, true, true, true));
+
+        this.game.addSprite(new Platform(50, CANVAS_HEIGHT - 150, 200, 30, COLOR1));
+
+        this.game.addSprite(new JokeText());
+
+        // Add gift
+        const gift = new Gift(CANVAS_WIDTH - 50, CANVAS_HEIGHT - 100, 35, 40, this.game); // Change level when collecting gift
+        this.game.addSprite(gift);
+    }
+}
+
 // Add camera
 let camera = new Camera();
 camera.setLevelBoundaries(500, 600);
@@ -366,4 +470,5 @@ camera.setLevelBoundaries(500, 600);
 const game = new Game(camera);
 game.addLevel(new Level1(game));
 game.addLevel(new Level2(game));
+game.addLevel(new Level3(game));
 game.animate();
