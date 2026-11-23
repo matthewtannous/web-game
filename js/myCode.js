@@ -71,7 +71,7 @@ class Wall extends Sprite {
 
 
 class Hero extends Sprite {
-    constructor(x, y, width, height, dX, color, maxJumps = 1) {
+    constructor(x, y, width, height, dX, color, maxJumps = 1, windPush = 0) {
         super();
 
         this.startX = x;
@@ -94,6 +94,9 @@ class Hero extends Sprite {
 
         // Change color information
         this.canChangeColor = true; // true if  c  is not being pressed
+
+        // Wind effect to constantly push the player
+        this.windPush = windPush;
     }
 
     update(sprites, keys) {
@@ -102,10 +105,17 @@ class Hero extends Sprite {
         const previousY = this.y;
 
         // Horizontal movement
-        if ((keys['ArrowLeft'] || keys['a']) && this.x >= 0) {
+        // Define notCrossedLeft and notCrossedRight to avoid recalculating twice
+        let notCrossedLeft = this.x >= 0;
+        let notCrossedRight = this.x <= CANVAS_WIDTH - this.width;
+
+        if (notCrossedLeft && notCrossedRight)
+            this.x += this.windPush;
+
+        if ((keys['ArrowLeft'] || keys['a']) && notCrossedLeft) {
             this.x -= this.dX;
         }
-        if ((keys['ArrowRight'] || keys['d']) && this.x <= CANVAS_WIDTH - this.width) {
+        if ((keys['ArrowRight'] || keys['d']) && notCrossedRight) {
             this.x += this.dX;
         }
 
@@ -248,6 +258,7 @@ class Hero extends Sprite {
         this.x = this.startX;
         this.y = this.startY;
         this.dY = 0;
+        this.color = COLOR1;
     }
 }
 
@@ -440,7 +451,7 @@ class Level3 extends Level {
         this.game.addSprite(new Background());
 
         // Add hero
-        const hero = new Hero(50, CANVAS_HEIGHT - 300, 50, 50, 5, COLOR1, 5);
+        const hero = new Hero(50, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1);
         this.game.addSprite(hero);
 
         // Add color helper
@@ -450,14 +461,29 @@ class Level3 extends Level {
         // Ground
         this.game.addSprite(new Wall(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0, true));
 
-        this.game.addSprite(new Wall(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 50, CANVAS_HEIGHT / 2, COLOR0, true, true, true, true));
+        this.game.addSprite(new Platform(50, CANVAS_HEIGHT - 80, 200, 30, COLOR1));
+        // this.game.addSprite(new Wall(260, CANVAS_HEIGHT - 190, 30, 50, COLOR0, true, true, true, true));
 
-        this.game.addSprite(new Platform(50, CANVAS_HEIGHT - 150, 200, 30, COLOR1));
+        this.game.addSprite(new Platform(330, CANVAS_HEIGHT - 100, 200, 30, COLOR2));
+        this.game.addSprite(new Platform(500, CANVAS_HEIGHT - 200, 50, 30, COLOR3));
 
-        this.game.addSprite(new JokeText());
+        this.game.addSprite(new Platform(260, CANVAS_HEIGHT - 250, 50, 50, COLOR2));
+        this.game.addSprite(new Platform(260, CANVAS_HEIGHT - 350, 50, 50, COLOR3));
+
+        this.game.addSprite(new Platform(80, CANVAS_HEIGHT - 450, 150, 30, COLOR1));
+        this.game.addSprite(new Platform(200, 250, 50, 30, COLOR2));
+        this.game.addSprite(new Platform(300, 150, 30, 20, COLOR3));
+
+        this.game.addSprite(new Wall(400, 100, 70, 30, COLOR0, true, true, true, true));
+        this.game.addSprite(new Platform(470, 100, 70, 30, COLOR3));
+        this.game.addSprite(new Wall(540, 100, 70, 30, COLOR0, true, true, true, true));
+
+        this.game.addSprite(new Wall(CANVAS_WIDTH / 2, 50, 30, 730, COLOR0, true, true, true, true));
+
+        // this.game.addSprite(new JokeText());
 
         // Add gift
-        const gift = new Gift(CANVAS_WIDTH - 50, CANVAS_HEIGHT - 100, 35, 40, this.game); // Change level when collecting gift
+        const gift = new Gift(800, CANVAS_HEIGHT - 100, 35, 40, this.game); // Change level when collecting gift
         this.game.addSprite(gift);
     }
 }
