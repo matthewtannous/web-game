@@ -474,16 +474,44 @@ class Level3 extends Level {
         this.game.addSprite(new Platform(200, 250, 50, 30, COLOR2));
         this.game.addSprite(new Platform(300, 150, 30, 20, COLOR3));
 
-        this.game.addSprite(new Wall(400, 100, 70, 30, COLOR0, true, true, true, true));
+        this.game.addSprite(new Wall(400, 80, 70, 30, COLOR0, true, true, true, true));
         this.game.addSprite(new Platform(470, 100, 70, 30, COLOR3));
-        this.game.addSprite(new Wall(540, 100, 70, 30, COLOR0, true, true, true, true));
+        this.game.addSprite(new Wall(540, 80, 70, 30, COLOR0, true, true, true, true));
 
         this.game.addSprite(new Wall(CANVAS_WIDTH / 2, 50, 30, 730, COLOR0, true, true, true, true));
 
-        // this.game.addSprite(new JokeText());
-
         // Add gift
         const gift = new Gift(800, CANVAS_HEIGHT - 100, 35, 40, this.game); // Change level when collecting gift
+        this.game.addSprite(gift);
+    }
+}
+
+class Level4 extends Level {
+    initialize() {
+        // Add background
+        this.game.addSprite(new Background());
+
+        // Add hero
+        const hero = new Hero(300, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1, -3);
+        this.game.addSprite(hero);
+
+        // Add color helper
+        this.game.addSprite(new ColorHelper(hero));
+
+        // Add platforms
+        // Ground
+        this.game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0));
+
+        this.game.addSprite(new Platform(500, CANVAS_HEIGHT - 150, 150, 25, COLOR1));
+        this.game.addSprite(new Platform(700, CANVAS_HEIGHT - 270, 150, 25, COLOR2));
+        this.game.addSprite(new Platform(900, CANVAS_HEIGHT - 390, 150, 25, COLOR3));
+        this.game.addSprite(new Platform(1100, CANVAS_HEIGHT - 510, 100, 25, COLOR1));
+
+        this.game.addSprite(new Platform(700, CANVAS_HEIGHT - 550, 100, 25, COLOR2));
+        this.game.addSprite(new Platform(300, CANVAS_HEIGHT - 600, 100, 25, COLOR3));
+
+        // Add gift
+        const gift = new Gift(20, 50, 35, 40, this.game); // Change level when collecting gift
         this.game.addSprite(gift);
     }
 }
@@ -497,4 +525,5 @@ const game = new Game(camera);
 game.addLevel(new Level1(game));
 game.addLevel(new Level2(game));
 game.addLevel(new Level3(game));
+game.addLevel(new Level4(game));
 game.animate();
