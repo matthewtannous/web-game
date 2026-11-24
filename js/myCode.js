@@ -516,6 +516,28 @@ class Level4 extends Level {
     }
 }
 
+class Level5 extends Level {
+    initialize() {
+        // Add background
+        this.game.addSprite(new Background());
+
+        // Add hero
+        const hero = new Hero(300, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1);
+        this.game.addSprite(hero);
+
+        // Add color helper
+        this.game.addSprite(new ColorHelper(hero));
+
+        // Add platforms
+        // Ground
+        this.game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0));
+
+        // Add gift
+        const gift = new Gift(CANVAS_WIDTH - 50, 50, 35, 40, this.game); // Change level when collecting gift
+        this.game.addSprite(gift);
+    }
+}
+
 // Add camera
 let camera = new Camera();
 camera.setLevelBoundaries(500, 600);
@@ -526,4 +548,5 @@ game.addLevel(new Level1(game));
 game.addLevel(new Level2(game));
 game.addLevel(new Level3(game));
 game.addLevel(new Level4(game));
+game.addLevel(new Level5(game));
 game.animate();
