@@ -341,6 +341,49 @@ class ColorHelper extends Sprite {
     }
 }
 
+class Button extends Sprite {
+    constructor(x, y, width, height, text, onClick) {
+        super();
+        this.width = width;
+        this.height = height;
+        this.x = x - this.width / 2;
+        this.y = y - this.height / 2;
+        this.text = text;
+        this.onClick = onClick;
+        this.isHovered = false;
+    }
+
+    update(sprites, keys, mouse) {
+        this.isHovered = this.isMouseOver(mouse);
+
+        if (mouse.clicked && this.isHovered) {
+            this.onClick();
+            mouse.clicked = false; // Prevent multiple triggers
+        }
+    }
+
+    isMouseOver(mouse) {
+        if (mouse == undefined) return false;
+        return (
+            mouse.x >= this.x &&
+            mouse.x <= this.x + this.width &&
+            mouse.y >= this.y &&
+            mouse.y <= this.y + this.height
+        );
+    }
+
+    draw(ctx) {
+        ctx.fillStyle = this.isHovered ? "#666" : "#333"; // Lighter color when hovered
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        ctx.fillStyle = "white";
+        ctx.font = "20px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2);
+    }
+}
+
 class TutorialText extends Sprite {
     update(sprites, keys) {
         if (Object.keys(keys).length !== 0) return true; // Delete the sprite
@@ -368,6 +411,16 @@ class JokeText extends Sprite {
         ctx.fillStyle = "black";
         ctx.textAlign = "center";
         ctx.fillText("Final Level (for now). You have 5 jumps! Good luck :)", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 3);
+    }
+}
+
+class LevelMenu extends Level {
+    initialize() {
+        this.game.addSprite(new Background());
+
+        this.game.addSprite(new Button(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 200, 50, "Start Game", () => {
+            this.game.changeLevel(1);
+        }));
     }
 }
 
@@ -544,6 +597,7 @@ camera.setLevelBoundaries(500, 600);
 
 // Start game
 const game = new Game(camera);
+game.addLevel(new LevelMenu(game));
 game.addLevel(new Level1(game));
 game.addLevel(new Level2(game));
 game.addLevel(new Level3(game));

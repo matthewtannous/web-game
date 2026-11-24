@@ -15,6 +15,10 @@ class Game {
         this.keys = {};
         this.bindKeyboardEvents();
 
+        this.mouse = { x: 0, y: 0, clicked: false };
+        this.bindMouseEvents();
+        this.mouseWasClicked = false;
+
         // Levels
         this.levels = [];
         this.currentLevelIndex = 0;
@@ -31,7 +35,7 @@ class Game {
     update() {
         let updatedSprites = [];
         for (let sprite of this.sprites) {
-            if (!sprite.update(this.sprites, this.keys)) {
+            if (!sprite.update(this.sprites, this.keys, this.mouse)) {
                 updatedSprites.push(sprite);
             }
         }
@@ -42,6 +46,9 @@ class Game {
             this.setLevel(this.pendingLevelIndex);
             this.pendingLevelIndex = null;
         }
+
+        // Reset mouse click
+        this.mouse.clicked = false;
     }
 
     draw() {
@@ -67,6 +74,27 @@ class Game {
         });
         window.addEventListener('keyup', (e) => {
             this.keys[e.key] = false;
+        });
+    }
+
+    bindMouseEvents() {
+        CANVAS.addEventListener("mousemove", (e) => {
+            const rect = CANVAS.getBoundingClientRect();
+            this.mouse.x = e.clientX - rect.left;
+            this.mouse.y = e.clientY - rect.top;
+        });
+
+        CANVAS.addEventListener("mousedown", () => {
+            this.mouse.down = true;
+            this.mouse.clicked = true; // Tracks single clicks
+        });
+
+        CANVAS.addEventListener("mouseup", () => {
+            this.mouse.down = false;
+        });
+
+        CANVAS.addEventListener("mouseleave", () => {
+            this.mouse.down = false;
         });
     }
 
