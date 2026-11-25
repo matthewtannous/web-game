@@ -26,6 +26,52 @@ class Background extends Sprite {
     }
 }
 
+class WindEffect extends Sprite {
+    constructor() {
+        super();
+
+        this.particles = [];
+
+        // Create wind particles
+        for (let i = 0; i < 50; i++) {
+            this.particles.push({
+                x: Math.random() * CANVAS_WIDTH,
+                y: Math.random() * CANVAS_HEIGHT,
+                length: 20 + Math.random() * 50,
+                speed: 3 + Math.random() * 5
+            });
+        }
+    }
+
+    update() {
+        for (let p of this.particles) {
+            // Move from right to left
+            p.x -= p.speed;
+
+            // Reset particle when it leaves the screen
+            if (p.x + p.length < 0) {
+                p.x = CANVAS_WIDTH + Math.random() * 100;
+                p.y = Math.random() * CANVAS_HEIGHT;
+            }
+        }
+    }
+
+    draw(ctx) {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.lineWidth = 2;
+
+        for (let p of this.particles) {
+            ctx.beginPath();
+
+            // Draw horizontal wind lines
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + p.length, p.y);
+
+            ctx.stroke();
+        }
+    }
+}
+
 class Platform extends Sprite {
     constructor(x, y, width, height, color) {
         super();
@@ -426,10 +472,10 @@ class Button extends Sprite {
 class TutorialText extends Sprite {
     draw(ctx) {
         ctx.font = "50px Arial";
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.fillText("Move left:  a or left arrow key", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 200);
-        ctx.fillText("Move right: d or right arrow key", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
+        ctx.fillText("Move left:  a or left arrow key", CANVAS_WIDTH / 2, 150);
+        ctx.fillText("Move right: d or right arrow key", CANVAS_WIDTH / 2, 250);
         ctx.fillText("Jump: space", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
         ctx.fillText("Change color: j or c", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
     }
@@ -454,7 +500,7 @@ class JokeText extends Sprite {
 
 class LevelMenu extends Level {
     initialize() {
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('menu-background.png'));
 
         this.game.addSprite(new Button(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100, 200, 50, "Start Game", () => {
             this.game.changeLevel(2);
@@ -468,7 +514,7 @@ class LevelMenu extends Level {
 
 class LevelHelp extends Level {
     initialize() {
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('menu-background.png'));
 
         // Add tutorial
         this.game.addSprite(new TutorialText());
@@ -483,7 +529,7 @@ class LevelHelp extends Level {
 class Level1 extends Level {
     initialize() {
         // Add background
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
         const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR1);
@@ -516,7 +562,7 @@ class Level1 extends Level {
 class Level2 extends Level {
     initialize() {
         // Add background
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
         const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR1);
@@ -553,7 +599,7 @@ class Level2 extends Level {
 class Level3 extends Level {
     initialize() {
         // Add background
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
         const hero = new Hero(50, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1);
@@ -594,7 +640,10 @@ class Level3 extends Level {
 class Level4 extends Level {
     initialize() {
         // Add background
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('level-background.png'));
+
+        // Add wind animation
+        this.game.addSprite(new WindEffect());
 
         // Add hero
         const hero = new Hero(300, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1, -3);
@@ -624,7 +673,7 @@ class Level4 extends Level {
 class Level5 extends Level {
     initialize() {
         // Add background
-        this.game.addSprite(new Background());
+        this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
         const hero = new Hero(300, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1);
