@@ -6,13 +6,23 @@ const COLOR0 = "black"; // Wall color, cannot phase through black object
 
 // Player colors
 const COLOR1 = "red";
-const COLOR2 = "blue";
-const COLOR3 = "yellow";
+const COLOR2 = "green";
+const COLOR3 = "blue";
 
 class Background extends Sprite {
+    constructor(imageSrc) {
+        super();
+        if (!imageSrc) return;
+        this.image = new Image();
+        this.image.src = "assets/images/" + imageSrc;
+    }
     draw(ctx) {
-        ctx.fillStyle = "lightblue";
-        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        if (this.image) {
+            ctx.drawImage(this.image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        } else {
+            ctx.fillStyle = "lightblue";
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
     }
 }
 
@@ -97,6 +107,11 @@ class Hero extends Sprite {
 
         // Wind effect to constantly push the player
         this.windPush = windPush;
+
+        // Sound effects
+        // Jump
+        this.jumpAudio = new Audio("assets/audio/jump.wav");
+
     }
 
     update(sprites, keys) {
@@ -123,6 +138,9 @@ class Hero extends Sprite {
             this.dY = this.jumpForce;
             this.jumpCount++;
             this.canJump = false;
+
+            // Play jump sound
+            this.jumpAudio.play();
         }
         if (!keys[' ']) this.canJump = true;
 
@@ -385,15 +403,14 @@ class Button extends Sprite {
 }
 
 class TutorialText extends Sprite {
-    update(sprites, keys) {
-        if (Object.keys(keys).length !== 0) return true; // Delete the sprite
-    }
-
     draw(ctx) {
         ctx.font = "50px Arial";
         ctx.fillStyle = "black";
         ctx.textAlign = "center";
-        ctx.fillText("Press j or c to change color", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+        ctx.fillText("Move left:  a or left arrow key", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 200);
+        ctx.fillText("Move right: d or right arrow key", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
+        ctx.fillText("Jump: space", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText("Change color: j or c", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
     }
 }
 
@@ -418,8 +435,26 @@ class LevelMenu extends Level {
     initialize() {
         this.game.addSprite(new Background());
 
-        this.game.addSprite(new Button(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 200, 50, "Start Game", () => {
+        this.game.addSprite(new Button(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100, 200, 50, "Start Game", () => {
+            this.game.changeLevel(2);
+        }));
+
+        this.game.addSprite(new Button(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, 200, 50, "Help", () => {
             this.game.changeLevel(1);
+        }));
+    }
+}
+
+class LevelHelp extends Level {
+    initialize() {
+        this.game.addSprite(new Background());
+
+        // Add tutorial
+        this.game.addSprite(new TutorialText());
+
+        // Add Button to go back to level menu
+        this.game.addSprite(new Button(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 300, 200, 50, "Back", () => {
+            this.game.changeLevel(0);
         }));
     }
 }
@@ -435,10 +470,6 @@ class Level1 extends Level {
 
         // Add color helper
         this.game.addSprite(new ColorHelper(hero));
-
-        // Add tutorial
-        this.game.addSprite(new TutorialText());
-
 
         // Add platforms
         // Ground
@@ -598,6 +629,7 @@ camera.setLevelBoundaries(500, 600);
 // Start game
 const game = new Game(camera);
 game.addLevel(new LevelMenu(game));
+game.addLevel(new LevelHelp(game));
 game.addLevel(new Level1(game));
 game.addLevel(new Level2(game));
 game.addLevel(new Level3(game));
