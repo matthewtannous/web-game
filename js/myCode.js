@@ -34,11 +34,32 @@ class Platform extends Sprite {
         this.width = width;
         this.height = height;
         this.color = color;
+        this.image = new Image();
+        this.image.src = "assets/images/platform-spritesheet.png";
     }
 
     draw(ctx) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        // Small platforms look weird as a sprite, will fix later
+        if (this.width > 50) {
+            switch (this.color) {
+                case COLOR1:
+                    ctx.drawImage(this.image, 0, 92, 522, 110, this.x, this.y, this.width, this.height);
+                    break;
+                case COLOR2:
+                    ctx.drawImage(this.image, 0, 511, 522, 110, this.x, this.y, this.width, this.height);
+                    break;
+                case COLOR3:
+                    ctx.drawImage(this.image, 0, 296, 522, 110, this.x, this.y, this.width, this.height);
+                    break;
+                default:
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+        } else {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        }
     }
 }
 
