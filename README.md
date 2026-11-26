@@ -1,3 +1,6 @@
+<!-- ![Work in progress!!](work-in-progress.jpg) -->
+<img src="work-in-progress.jpg" height=400>
+
 # Super Mario+
 
 A small platformer game made in JavaScript.
