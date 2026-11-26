@@ -179,6 +179,25 @@ class Hero extends Sprite {
         // Jump
         this.jumpAudio = new Audio("assets/audio/jump.wav");
 
+        // Spritesheet
+        this.spritesheet = new Image();
+        this.spritesheet.src = "assets/images/hero-spritesheet.png";
+
+        this.frameWidth = 2172 / 16;
+        this.frameHeight = 682 / 3;
+
+        this.currentFrame = 0;
+        this.animationTimer = 0;
+        this.animationSpeed = 6;
+
+        // Sprite animation rows
+        this.colorRows = {
+            [COLOR1]: 0,
+            [COLOR2]: 2,
+            [COLOR3]: 1,
+        };
+
+        this.facingRight = true;
     }
 
     update(sprites, keys) {
@@ -196,9 +215,11 @@ class Hero extends Sprite {
 
         if ((keys['ArrowLeft'] || keys['a']) && notCrossedLeft) {
             this.x -= this.dX;
+            this.facingRight = false;
         }
         if ((keys['ArrowRight'] || keys['d']) && notCrossedRight) {
             this.x += this.dX;
+            this.facingRight = true;
         }
 
         if (keys[' '] && this.canJump && this.jumpCount < this.maxJumps) {
@@ -327,16 +348,74 @@ class Hero extends Sprite {
                 this.jumpCount = 0;
             }
         }
+
+        // Spritesheet animation
+        // Sprite animation
+        this.animationTimer++;
+
+        if (this.jumpCount > 0) {
+            // Jump animation (frames 10-13)
+            this.currentFrame = 10 + Math.min(
+                3,
+                Math.floor(Math.abs(this.dY) / 4)
+            );
+        } else if (keys['ArrowLeft'] || keys['ArrowRight'] ||
+            keys['a'] || keys['d']) {
+
+            // Walking animation (frames 0-9)
+            if (this.animationTimer >= this.animationSpeed) {
+                this.currentFrame++;
+
+                if (this.currentFrame > 9) {
+                    this.currentFrame = 0;
+                }
+
+                this.animationTimer = 0;
+            }
+        } else {
+            // Idle animation
+            this.currentFrame = 0;
+        }
     }
 
     draw(ctx) {
-        ctx.beginPath();
+        if (!this.spritesheet.complete || this.spritesheet.naturalWidth === 0) {
+            ctx.beginPath();
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            return;
+        }
 
-        // ctx.fillStyle = "#e62f2fb0";
-        ctx.fillStyle = this.color;
-        // ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2, false);
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        // ctx.fill();
+        // Spritesheet animation
+        ctx.save();
+
+        if (!this.facingRight) {
+            ctx.translate(this.x + this.width, this.y);
+            ctx.scale(-1, 1);
+        } else {
+            ctx.translate(this.x, this.y);
+        }
+
+        const row = this.colorRows[this.color] ?? 0;
+
+        const sx = this.currentFrame * this.frameWidth;
+        const sy = row * this.frameHeight;
+
+        ctx.imageSmoothingEnabled = false;
+
+        ctx.drawImage(
+            this.spritesheet,
+            sx,
+            sy,
+            this.frameWidth,
+            this.frameHeight,
+            0,
+            0,
+            this.width,
+            this.height
+        );
+
+        ctx.restore();
     }
 
     die() {
