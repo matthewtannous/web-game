@@ -469,7 +469,7 @@ class Hero extends Sprite {
         const row = this.colorRows[this.color] ?? 0;
 
         const sx = this.currentFrame * this.frameWidth;
-        const sy = row * this.frameHeight;
+        const sy = row * this.frameHeight - 10; // -10 to make bottom collisions better
 
         ctx.imageSmoothingEnabled = false;
 
@@ -681,7 +681,7 @@ class Level1 extends Level {
         this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
-        const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR1);
+        const hero = new Hero(100, CANVAS_HEIGHT - 100, 70, 70, 5, COLOR1);
         this.game.addSprite(hero);
 
         // Add color helper
@@ -714,7 +714,7 @@ class Level2 extends Level {
         this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
-        const hero = new Hero(50, CANVAS_HEIGHT - 100, 50, 50, 5, COLOR1);
+        const hero = new Hero(50, CANVAS_HEIGHT - 100, 70, 70, 5, COLOR1);
         this.game.addSprite(hero);
 
         // Add color helper
@@ -751,7 +751,7 @@ class Level3 extends Level {
         this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
-        const hero = new Hero(50, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1);
+        const hero = new Hero(50, CANVAS_HEIGHT - 150, 70, 70, 5, COLOR1, 1);
         this.game.addSprite(hero);
 
         // Add color helper
@@ -774,9 +774,9 @@ class Level3 extends Level {
         this.game.addSprite(new Platform(200, 250, 50, 30, COLOR2));
         this.game.addSprite(new Platform(300, 150, 30, 20, COLOR3));
 
-        this.game.addSprite(new Wall(400, 80, 70, 30, COLOR0, true, true, true, true));
-        this.game.addSprite(new Platform(470, 100, 70, 30, COLOR3));
-        this.game.addSprite(new Wall(540, 80, 70, 30, COLOR0, true, true, true, true));
+        this.game.addSprite(new Wall(380, 80, 60, 30, COLOR0, true, true, true, true));
+        this.game.addSprite(new Platform(450, 100, 90, 30, COLOR3));
+        this.game.addSprite(new Wall(560, 80, 50, 30, COLOR0, true, true, true, true));
 
         this.game.addSprite(new Wall(CANVAS_WIDTH / 2, 50, 30, 730, COLOR0, true, true, true, true));
 
@@ -795,7 +795,7 @@ class Level4 extends Level {
         this.game.addSprite(new WindEffect());
 
         // Add hero
-        const hero = new Hero(300, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1, -3);
+        const hero = new Hero(300, CANVAS_HEIGHT - 150, 70, 70, 5, COLOR1, 1, -3);
         this.game.addSprite(hero);
 
         // Add color helper
@@ -825,7 +825,7 @@ class Level5 extends Level {
         this.game.addSprite(new Background('level-background.png'));
 
         // Add hero
-        const hero = new Hero(300, CANVAS_HEIGHT - 150, 50, 50, 5, COLOR1, 1);
+        const hero = new Hero(300, CANVAS_HEIGHT - 150, 70, 70, 5, COLOR1, 1);
         this.game.addSprite(hero);
 
         // Add color helper
