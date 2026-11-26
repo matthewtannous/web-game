@@ -126,23 +126,93 @@ class Wall extends Sprite {
         this.bottomSpikes = bottomSpikes;
     }
 
+
     draw(ctx) {
+        // Draw wall
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
-        // Draw spikes (just a rectangle for now)
-        ctx.fillStyle = "gray";
-        if (this.topSpikes)
-            ctx.fillRect(this.x, this.y, this.width, 10);
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
 
-        if (this.bottomSpikes)
-            ctx.fillRect(this.x, this.y + this.height - 10, this.width, 10);
+        const spikeSize = 20;
 
-        if (this.leftSpikes)
-            ctx.fillRect(this.x, this.y, 10, this.height);
+        const drawSpikes = (side) => {
+            const horizontal = side === "top" || side === "bottom";
+            const length = horizontal ? this.width : this.height;
 
-        if (this.rightSpikes)
-            ctx.fillRect(this.x + this.width - 10, this.y, 10, this.height);
+            const count = Math.max(1, Math.floor(length / spikeSize));
+            const spacing = length / count;
+
+            for (let i = 0; i < count; i++) {
+                const start = i * spacing;
+                const end = (i + 1) * spacing;
+                const middle = (start + end) / 2;
+
+                ctx.beginPath();
+
+                if (side === "top") {
+                    ctx.moveTo(this.x + start, this.y);
+                    ctx.lineTo(this.x + middle, this.y - spikeSize);
+                    ctx.lineTo(this.x + end, this.y);
+                }
+                else if (side === "bottom") {
+                    ctx.moveTo(this.x + start, this.y + this.height);
+                    ctx.lineTo(this.x + middle, this.y + this.height + spikeSize);
+                    ctx.lineTo(this.x + end, this.y + this.height);
+                }
+                else if (side === "left") {
+                    ctx.moveTo(this.x, this.y + start);
+                    ctx.lineTo(this.x - spikeSize, this.y + middle);
+                    ctx.lineTo(this.x, this.y + end);
+                }
+                else if (side === "right") {
+                    ctx.moveTo(this.x + this.width, this.y + start);
+                    ctx.lineTo(this.x + this.width + spikeSize, this.y + middle);
+                    ctx.lineTo(this.x + this.width, this.y + end);
+                }
+
+                ctx.closePath();
+
+                ctx.fillStyle = "#888";
+                ctx.fill();
+
+                ctx.strokeStyle = "#333";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Highlight the upper-facing edge
+                ctx.beginPath();
+
+                if (side === "top" || side === "bottom") {
+                    ctx.moveTo(this.x + start + 2,
+                        side === "top" ? this.y - 2 : this.y + this.height + 2);
+                    ctx.lineTo(this.x + middle,
+                        side === "top" ? this.y - spikeSize + 2 :
+                            this.y + this.height + spikeSize - 2);
+                } else {
+                    ctx.moveTo(
+                        side === "left" ? this.x - 2 : this.x + this.width + 2,
+                        this.y + start + 2
+                    );
+                    ctx.lineTo(
+                        side === "left" ? this.x - spikeSize + 2 :
+                            this.x + this.width + spikeSize - 2,
+                        this.y + middle
+                    );
+                }
+
+                ctx.strokeStyle = "#ccc";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        };
+
+        if (this.topSpikes) drawSpikes("top");
+        if (this.bottomSpikes) drawSpikes("bottom");
+        if (this.leftSpikes) drawSpikes("left");
+        if (this.rightSpikes) drawSpikes("right");
     }
 }
 
