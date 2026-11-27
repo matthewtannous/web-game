@@ -1,5 +1,5 @@
 <!-- ![Work in progress!!](work-in-progress.jpg) -->
-<img src="work-in-progress.jpg" height=400>
+<!-- <img src="work-in-progress.jpg" height=400> -->
 
 # Super Mario+
 
