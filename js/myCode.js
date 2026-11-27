@@ -824,8 +824,11 @@ class Level5 extends Level {
         // Add background
         this.game.addSprite(new Background('level-background.png'));
 
+        // Add wind
+        this.game.addSprite(new WindEffect());
+
         // Add hero
-        const hero = new Hero(300, CANVAS_HEIGHT - 150, 70, 70, 5, COLOR1, 1);
+        const hero = new Hero(CANVAS_WIDTH - 75, CANVAS_HEIGHT - 150, 70, 70, 5, COLOR1, 1, -6);
         this.game.addSprite(hero);
 
         // Add color helper
@@ -835,8 +838,26 @@ class Level5 extends Level {
         // Ground
         this.game.addSprite(new Platform(0, CANVAS_HEIGHT - 25, CANVAS_WIDTH, 25, COLOR0));
 
+        this.game.addSprite(new Platform(1100, 650, 150, 25, COLOR1));
+        this.game.addSprite(new Platform(950, 530, 150, 25, COLOR2));
+        this.game.addSprite(new Platform(800, 410, 150, 25, COLOR1));
+        this.game.addSprite(new Platform(700, 350, 150, 25, COLOR3));
+
+        // Right wall
+        this.game.addSprite(new Wall(700, 300, 20, 500, COLOR0, true, false, false, true));
+
+        this.game.addSprite(new Platform(540, 280, 150, 25, COLOR1));
+        this.game.addSprite(new Platform(540, 350, 150, 25, COLOR2));
+        this.game.addSprite(new Platform(540, 420, 150, 25, COLOR3));
+        this.game.addSprite(new Platform(540, 490, 150, 25, COLOR1));
+
+        this.game.addSprite(new Platform(400, 650, 150, 25, COLOR2));
+
+        // Left wall
+        this.game.addSprite(new Wall(500, 0, 20, 500, COLOR0, false, true, false, true));
+
         // Add gift
-        const gift = new Gift(CANVAS_WIDTH - 50, 50, 35, 40, this.game); // Change level when collecting gift
+        const gift = new Gift(50, CANVAS_HEIGHT - 100, 35, 40, this.game); // Change level when collecting gift
         this.game.addSprite(gift);
     }
 }
