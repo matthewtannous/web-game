@@ -1,4 +1,4 @@
-# Super Mario+
+# Color Coded
 
 A small platformer game made in JavaScript.
 
